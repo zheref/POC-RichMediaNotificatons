@@ -52,7 +52,7 @@
                                                                                                     error:&error];
                 if (attachment)
                 {
-                    [self bestAttemptContent].attachments = @[attachment, attachment];
+                    [self bestAttemptContent].attachments = @[attachment];
                 }
             }
             

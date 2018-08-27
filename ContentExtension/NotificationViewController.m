@@ -28,7 +28,7 @@
 
 - (void)didReceiveNotification:(UNNotification *)notification {
     self.label.text = notification.request.content.body;
-    //[self downloadImage: notification];
+    [self downloadImage: notification];
 }
 
 - (void)downloadImage:(UNNotification *) notification {
@@ -43,13 +43,25 @@
     NSURLSession *defaultSession = [NSURLSession sessionWithConfiguration:defaultConfigObject];
     
     NSURLSessionDownloadTask *downloadTaskForEDV = [defaultSession downloadTaskWithURL:edvImageUrl completionHandler:^(NSURL * _Nullable location, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-        NSLog(@"FINISHED Downloading bloomed: %@", edvImageUrlString);
+        //NSLog(@"FINISHED Downloading bloomed: %@", edvImageUrlString);
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            self.label.text = edvImageUrlString;
+            if (error != nil) {
+                self.label.text = error.localizedDescription;
+            } else {
+                self.label.text = @"Error IS nil";
+            }
+            
             NSData *data = [[NSData alloc] initWithContentsOfURL:location];
-            UIImage *image = [[UIImage alloc] initWithData:data];
-            [self.image setImage:image];
+            
+            if (data != nil) {
+                UIImage *image = [[UIImage alloc] initWithData:data];
+                [self.image setImage:image];
+                self.label.text = edvImageUrlString;
+            } else {
+                self.label.text = @"Data is nil";
+            }
+            
         });
     }];
     
