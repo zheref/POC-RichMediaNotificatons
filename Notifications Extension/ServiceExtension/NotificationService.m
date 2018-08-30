@@ -57,20 +57,7 @@
             }
             
             if (weakSelf != nil) {
-                NSString *edvImageUrlString = weakSelf.bestAttemptContent.userInfo[@"bloomed-image-url"];
-
-                NSURL *edvImageUrl = [[NSURL alloc] initWithString:edvImageUrlString];
-
-                NSLog(@"Downloading bloomed: %@", edvImageUrlString);
-
-                NSURLSessionDownloadTask *downloadTaskForEDV = [defaultSession downloadTaskWithURL:edvImageUrl completionHandler:^(NSURL * _Nullable location, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-                    NSLog(@"FINISHED Downloading bloomed: %@", edvImageUrlString);
-                    weakSelf.contentHandler(weakSelf.bestAttemptContent);
-                }];
-
-                [downloadTaskForEDV resume];
-                
-                //weakSelf.contentHandler(weakSelf.bestAttemptContent);
+                weakSelf.contentHandler(weakSelf.bestAttemptContent);
             }
             
         }];
