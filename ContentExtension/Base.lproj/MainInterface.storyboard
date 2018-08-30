@@ -15,41 +15,30 @@
             <objects>
                 <viewController id="M4Y-Lb-cyx" userLabel="Notification View Controller" customClass="NotificationViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" simulatedAppContext="notificationCenter" id="S3S-Oj-5AN">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="200"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="220"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="top" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Hello World" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="280" translatesAutoresizingMaskIntoConstraints="NO" id="GcN-lo-r42">
-                                <rect key="frame" x="0.0" y="155" width="320" height="45"/>
-                                <color key="backgroundColor" red="0.16078431369999999" green="0.81176470590000005" blue="0.61960784310000006" alpha="1" colorSpace="calibratedRGB"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="edvImage" translatesAutoresizingMaskIntoConstraints="NO" id="ZOd-dj-dmR">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="155"/>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ZOd-dj-dmR">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="220"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="155" id="q8o-v1-Dxw"/>
+                                    <constraint firstAttribute="height" constant="220" id="Fto-D0-Snp"/>
                                 </constraints>
                             </imageView>
                         </subviews>
-                        <color key="backgroundColor" red="0.60784313729999995" green="0.60784313729999995" blue="0.60784313729999995" alpha="1" colorSpace="calibratedRGB"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="ZOd-dj-dmR" firstAttribute="leading" secondItem="2BE-c3-nQJ" secondAttribute="leading" id="0Ep-Uu-uhF"/>
-                            <constraint firstItem="2BE-c3-nQJ" firstAttribute="bottom" secondItem="GcN-lo-r42" secondAttribute="bottom" symbolic="YES" id="0Q0-KW-PJ6"/>
-                            <constraint firstItem="GcN-lo-r42" firstAttribute="top" secondItem="ZOd-dj-dmR" secondAttribute="bottom" id="6Mb-6a-vug"/>
-                            <constraint firstItem="GcN-lo-r42" firstAttribute="leading" secondItem="2BE-c3-nQJ" secondAttribute="leading" symbolic="YES" id="6Vq-gs-PHe"/>
                             <constraint firstItem="ZOd-dj-dmR" firstAttribute="top" secondItem="2BE-c3-nQJ" secondAttribute="top" id="7LP-Z7-zjz"/>
-                            <constraint firstItem="2BE-c3-nQJ" firstAttribute="trailing" secondItem="GcN-lo-r42" secondAttribute="trailing" symbolic="YES" id="L8K-9R-egU"/>
+                            <constraint firstItem="ZOd-dj-dmR" firstAttribute="bottom" secondItem="2BE-c3-nQJ" secondAttribute="bottom" id="OjU-iP-b8c"/>
                             <constraint firstItem="2BE-c3-nQJ" firstAttribute="trailing" secondItem="ZOd-dj-dmR" secondAttribute="trailing" id="cis-U2-wms"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="2BE-c3-nQJ"/>
                     </view>
                     <extendedEdge key="edgesForExtendedLayout"/>
                     <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
-                    <size key="freeformSize" width="320" height="200"/>
+                    <size key="freeformSize" width="320" height="220"/>
                     <connections>
                         <outlet property="image" destination="ZOd-dj-dmR" id="3xq-4y-IXI"/>
-                        <outlet property="label" destination="GcN-lo-r42" id="lpW-cU-7IG"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="vXp-U4-Rya" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -57,7 +46,4 @@
             <point key="canvasLocation" x="137.59999999999999" y="133.13343328335833"/>
         </scene>
     </scenes>
-    <resources>
-        <image name="edvImage" width="2000" height="1200"/>
-    </resources>
 </document>

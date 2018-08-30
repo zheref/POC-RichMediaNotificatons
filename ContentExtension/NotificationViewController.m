@@ -12,7 +12,6 @@
 
 @interface NotificationViewController () <UNNotificationContentExtension>
 
-@property IBOutlet UILabel *label;
 @property (weak, nonatomic) IBOutlet UIImageView *image;
 
 @end
@@ -21,64 +20,48 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any required interface initialization here.
-    
-    
 }
 
 - (void)didReceiveNotification:(UNNotification *)notification {
-    self.label.text = notification.request.content.body;
     [self downloadImage: notification];
 }
 
-- (void)downloadImage:(UNNotification *) notification {
+- (void)downloadImage:(UNNotification *) notification
+{
     NSString *edvImageUrlString = notification.request.content.userInfo[@"bloomed-image-url"];
     
     NSURL *edvImageUrl = [[NSURL alloc] initWithString:edvImageUrlString];
     
     NSLog(@"Downloading bloomed: %@", edvImageUrlString);
-    self.label.text = @"Downloading bloomed: %@";
     
     NSURLSessionConfiguration *defaultConfigObject = [NSURLSessionConfiguration defaultSessionConfiguration];
     NSURLSession *defaultSession = [NSURLSession sessionWithConfiguration:defaultConfigObject];
     
+    __weak __typeof(self) weakSelf = self;
+    
     NSURLSessionDownloadTask *downloadTaskForEDV = [defaultSession downloadTaskWithURL:edvImageUrl completionHandler:^(NSURL * _Nullable location, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-        //NSLog(@"FINISHED Downloading bloomed: %@", edvImageUrlString);
+        NSLog(@"FINISHED Downloading bloomed: %@", edvImageUrlString);
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            if (error != nil) {
-                self.label.text = error.localizedDescription;
-            } else {
-                self.label.text = @"Error IS nil";
+            if (error != nil)
+            {
+                NSLog(@"Error: %@", error.localizedDescription);
+                return;
             }
             
             NSData *data = [[NSData alloc] initWithContentsOfURL:location];
             
-            if (data != nil) {
-                UIImage *image = [[UIImage alloc] initWithData:data];
-                [self.image setImage:image];
-                self.label.text = edvImageUrlString;
-            } else {
-                self.label.text = @"Data is nil";
-            }
+            NotificationViewController *strongSelf = weakSelf;
             
+            if (data != nil && strongSelf != nil)
+            {
+                UIImage *image = [[UIImage alloc] initWithData:data];
+                [strongSelf.image setImage:image];
+            }
         });
     }];
     
     [downloadTaskForEDV resume];
-    
-//    dispatch_async(dispatch_get_global_queue(0,0), ^{
-//        NSData * data = [[NSData alloc] initWithContentsOfURL: [NSURL URLWithString: edvImageUrlString]];
-//        if ( data == nil )
-//            return;
-//
-//        dispatch_async(dispatch_get_main_queue(), ^{
-//            // WARNING: is the cell still using the same data by this point??
-//            self.label.text = @"HELLO Downloading bloomed: %@";
-//            UIImage *image = [[UIImage alloc] initWithData:data];
-//            [self.image setImage:image];
-//        });
-//    });
 }
 
 @end
