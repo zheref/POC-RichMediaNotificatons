@@ -20,7 +20,15 @@ class NotificationService: UNNotificationServiceExtension {
         bestAttemptContent = (request.content.mutableCopy() as? UNMutableNotificationContent)
         
         if let bestAttemptContent = bestAttemptContent {
-            guard let thumbnailUrlString = bestAttemptContent.userInfo["thumbnail-url"] as? String,
+            var tentativeThumbnailUrlString: String?
+            
+            if let imageThumbnailUrlString = bestAttemptContent.userInfo["thumbnail-url"] as? String {
+                tentativeThumbnailUrlString = imageThumbnailUrlString
+            } else if let videoThumbnailUrlString = bestAttemptContent.userInfo["video-thumbnail-url"] as? String {
+                tentativeThumbnailUrlString = videoThumbnailUrlString
+            }
+            
+            guard let thumbnailUrlString = tentativeThumbnailUrlString,
                 let thumbnailUrl = URL(string: thumbnailUrlString) else {
                     return
             }
