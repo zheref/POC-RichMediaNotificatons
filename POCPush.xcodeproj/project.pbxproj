@@ -20,6 +20,7 @@
 		9D41020621348A6B0019AB74 /* ContentExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 9D4101F921348A6B0019AB74 /* ContentExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		9D41020A2134AD550019AB74 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 098AB376212A81C300CCB575 /* Assets.xcassets */; };
 		9D41020B2134AD550019AB74 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 098AB376212A81C300CCB575 /* Assets.xcassets */; };
+		9DBF260C213F307F00A704CD /* NotificationServiceUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DBF260B213F307F00A704CD /* NotificationServiceUtils.swift */; };
 		9DDBBDEA21389C9F00432F05 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DDBBDE921389C9F00432F05 /* NotificationService.swift */; };
 		9DDBBDF62138A0D500432F05 /* NotificationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DDBBDF52138A0D500432F05 /* NotificationViewController.swift */; };
 		CF778DB047EA3C81CDA6D450 /* libPods-POCPush.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6A1B04D95F6FEB3E1E64EB0C /* libPods-POCPush.a */; };
@@ -78,6 +79,7 @@
 		9D4101F921348A6B0019AB74 /* ContentExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ContentExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		9D41020121348A6B0019AB74 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
 		9D41020321348A6B0019AB74 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9DBF260B213F307F00A704CD /* NotificationServiceUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationServiceUtils.swift; sourceTree = "<group>"; };
 		9DDBBDE821389C9E00432F05 /* Service Extension-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Service Extension-Bridging-Header.h"; sourceTree = "<group>"; };
 		9DDBBDE921389C9F00432F05 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		9DDBBDF42138A0D500432F05 /* ContentExtension-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ContentExtension-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -130,6 +132,7 @@
 				098560C9212DC977009A696B /* Service-Info.plist */,
 				9DDBBDE921389C9F00432F05 /* NotificationService.swift */,
 				9DDBBDE821389C9E00432F05 /* Service Extension-Bridging-Header.h */,
+				9DBF260B213F307F00A704CD /* NotificationServiceUtils.swift */,
 			);
 			path = ServiceExtension;
 			sourceTree = "<group>";
@@ -372,6 +375,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9DBF260C213F307F00A704CD /* NotificationServiceUtils.swift in Sources */,
 				9DDBBDEA21389C9F00432F05 /* NotificationService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

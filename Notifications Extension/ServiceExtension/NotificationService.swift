@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import MobileCoreServices
+
 import UserNotifications
 
 class NotificationService: UNNotificationServiceExtension {
@@ -19,53 +19,33 @@ class NotificationService: UNNotificationServiceExtension {
         self.contentHandler = contentHandler
         bestAttemptContent = (request.content.mutableCopy() as? UNMutableNotificationContent)
         
-        if let bestAttemptContent = bestAttemptContent {
-            var tentativeThumbnailUrlString: String?
-            
-            if let imageThumbnailUrlString = bestAttemptContent.userInfo["thumbnail-url"] as? String {
-                tentativeThumbnailUrlString = imageThumbnailUrlString
-            } else if let videoThumbnailUrlString = bestAttemptContent.userInfo["video-thumbnail-url"] as? String {
-                tentativeThumbnailUrlString = videoThumbnailUrlString
+        guard let bestAttemptContent = bestAttemptContent else {
+            return
+        }
+        
+        let payloadObject = NotificationServiceUtils.translateToObject(from: bestAttemptContent.userInfo)
+        
+        guard let thumbnailUrlString = payloadObject.thumbnail,
+            let thumbnailUrl = URL(string: thumbnailUrlString) else {
+                return
+        }
+        
+        NotificationServiceUtils.downloadPhoto(withUrl: thumbnailUrl) { [weak self] (attachment, error) in
+            if let error = error {
+                print(error.localizedDescription)
             }
             
-            guard let thumbnailUrlString = tentativeThumbnailUrlString,
-                let thumbnailUrl = URL(string: thumbnailUrlString) else {
-                    return
+            guard let attachment = attachment else {
+                return
             }
             
-            let defaultConfig = URLSessionConfiguration.default
-            let defaultSession = URLSession(configuration: defaultConfig)
+            bestAttemptContent.attachments = [attachment]
             
-            let downloadTask = defaultSession.downloadTask(with: thumbnailUrl) { [weak self] (location, response, error) in
-                if let error = error {
-                    print(error.localizedDescription)
-                }
+            if payloadObject is VideoNotificationContentPayload {
                 
-                guard let location = location else {
-                    return
-                }
-                
-                var attachment: UNNotificationAttachment?
-                
-                do {
-                    attachment = try UNNotificationAttachment(identifier: thumbnailUrlString, url: location, options: [
-                        UNNotificationAttachmentOptionsTypeHintKey: kUTTypeJPEG
-                        ])
-                } catch let error {
-                    print(error.localizedDescription)
-                    return
-                }
-                
-                guard let theAttachment = attachment,
-                    let bestAttemptContent = self?.bestAttemptContent else {
-                        return
-                }
-                
-                bestAttemptContent.attachments = [theAttachment]
+            } else {
                 self?.contentHandler?(bestAttemptContent)
             }
-            
-            downloadTask.resume()
         }
     }
     
