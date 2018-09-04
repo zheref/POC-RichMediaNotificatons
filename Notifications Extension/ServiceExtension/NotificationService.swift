@@ -27,22 +27,32 @@ class NotificationService: UNNotificationServiceExtension {
         
         guard let thumbnailUrlString = payloadObject.thumbnail,
             let thumbnailUrl = URL(string: thumbnailUrlString) else {
+                contentHandler(bestAttemptContent)
                 return
         }
         
         NotificationServiceUtils.downloadPhoto(withUrl: thumbnailUrl) { [weak self] (attachment, error) in
             if let error = error {
                 print(error.localizedDescription)
+            } else if let attachment = attachment {
+                bestAttemptContent.attachments = [attachment]
             }
-            
-            guard let attachment = attachment else {
-                return
-            }
-            
-            bestAttemptContent.attachments = [attachment]
             
             if payloadObject is VideoNotificationContentPayload {
+                guard let videoUrlString = payloadObject.edvMedia,
+                    let videoUrl = URL(string: videoUrlString) else {
+                        return
+                }
                 
+                NotificationServiceUtils.downloadVideo(withUrl: videoUrl, through: { [weak self] (attachment, error) in
+                    if let error = error {
+                        print(error.localizedDescription)
+                    } else if let attachment = attachment {
+                        bestAttemptContent.attachments = [attachment]
+                    }
+                    
+                    self?.contentHandler?(bestAttemptContent)
+                })
             } else {
                 self?.contentHandler?(bestAttemptContent)
             }
