@@ -64,11 +64,11 @@ class NotificationService: UNNotificationServiceExtension {
                         return
                 }
                 
-                NotificationServiceUtils.downloadPhoto(withUrl: imageUrl, hidden: false, through: { [weak self] (imageAttachment, error) in
+                NotificationServiceUtils.downloadPhoto(withUrl: imageUrl, hidden: true, through: { [weak self] (imageAttachment, error) in
                     if let error = error {
                         self?.debug(error.localizedDescription)
                     } else if let imageAttachment = imageAttachment {
-                        bestAttemptContent.attachments = [imageAttachment]
+                        bestAttemptContent.attachments = [imageAttachment, attachment]
                     }
                     
                     self?.contentHandler?(bestAttemptContent)
