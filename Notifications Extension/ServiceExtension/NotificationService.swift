@@ -79,7 +79,6 @@ class NotificationService: UNNotificationServiceExtension {
     
     private func debug(_ message: String) {
         print(message)
-        bestAttemptContent?.body = message
     }
     
     override func serviceExtensionTimeWillExpire() {

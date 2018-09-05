@@ -68,7 +68,7 @@ struct NotificationServiceUtils {
             let path = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0]
             
             var localUrl = URL(fileURLWithPath: path)
-            localUrl = localUrl.appendingPathComponent("image.jpg")
+            localUrl = localUrl.appendingPathComponent("image\(hidden ? "hidden" : "").jpg")
             
             try? FileManager.default.moveItem(at: downloadedUrl, to: localUrl)
             
