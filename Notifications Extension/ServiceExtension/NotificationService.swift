@@ -9,8 +9,11 @@
 import Foundation
 
 import UserNotifications
+import CoreGraphics
 
 class NotificationService: UNNotificationServiceExtension {
+    
+    static let thumbnailSize = CGSize(width: 20.0, height: 20.0)
     
     var contentHandler: ((UNNotificationContent) -> Void)?
     var bestAttemptContent: UNMutableNotificationContent?
@@ -31,6 +34,15 @@ class NotificationService: UNNotificationServiceExtension {
                 return
         }
         
+//        let combinerObject = ESPNCombinerObject(imageURL: thumbnailUrl,
+//                                                width: NotificationService.thumbnailSize.width as NSNumber,
+//                                                height: NotificationService.thumbnailSize.height as NSNumber)
+//
+//        guard let combinedObject = combinerObject,
+//            let combinedThumbnailUrl = NSURL.combinerURL(for: combinedObject) else {
+//                return
+//        }
+        
         NotificationServiceUtils.downloadPhoto(withUrl: thumbnailUrl, hidden: false) { [weak self] (attachment, error) in
             if let error = error {
                 self?.debug(error.localizedDescription)
@@ -43,38 +55,54 @@ class NotificationService: UNNotificationServiceExtension {
             
             bestAttemptContent.attachments = [attachment]
             
-            if payloadObject is VideoNotificationContentPayload {
-                guard let videoUrlString = payloadObject.edvMedia,
-                    let videoUrl = URL(string: videoUrlString) else {
-                        return
-                }
-                
-                NotificationServiceUtils.downloadVideo(withUrl: videoUrl, through: { [weak self] (videoAttachment, error) in
-                    if let error = error {
-                        self?.debug(error.localizedDescription)
-                    } else if let videoAttachment = videoAttachment {
-                        bestAttemptContent.attachments = [videoAttachment, attachment]
-                    }
-                    
-                    self?.contentHandler?(bestAttemptContent)
-                })
-            } else {
-                guard let imageUrlString = payloadObject.edvMedia,
-                    let imageUrl = URL(string: imageUrlString) else {
-                        return
-                }
-                
-                NotificationServiceUtils.downloadPhoto(withUrl: imageUrl, hidden: true, through: { [weak self] (imageAttachment, error) in
-                    if let error = error {
-                        self?.debug(error.localizedDescription)
-                    } else if let imageAttachment = imageAttachment {
-                        bestAttemptContent.attachments = [imageAttachment, attachment]
-                    }
-                    
-                    self?.contentHandler?(bestAttemptContent)
-                })
+            if let payloadObject = payloadObject as? VideoNotificationContentPayload {
+                self?.handleEDVVideo(withPayload: payloadObject,
+                                     andThumbnail: attachment)
+            } else if let payloadObject = payloadObject as? ImageNotificationContentPayload {
+                self?.handleEDVPhoto(withPayload: payloadObject,
+                                     andThumbnail: attachment)
             }
         }
+    }
+    
+    private func handleEDVVideo(withPayload payloadObject: VideoNotificationContentPayload,
+                                andThumbnail thumbnailAttachment: UNNotificationAttachment) {
+        
+        guard let bestAttemptContent = bestAttemptContent,
+            let videoUrlString = payloadObject.edvMedia,
+            let videoUrl = URL(string: videoUrlString) else {
+                return
+        }
+        
+        NotificationServiceUtils.downloadVideo(withUrl: videoUrl, through: { [weak self] (videoAttachment, error) in
+            if let error = error {
+                self?.debug(error.localizedDescription)
+            } else if let videoAttachment = videoAttachment {
+                bestAttemptContent.attachments = [videoAttachment, thumbnailAttachment]
+            }
+            
+            self?.contentHandler?(bestAttemptContent)
+        })
+    }
+    
+    private func handleEDVPhoto(withPayload payloadObject: ImageNotificationContentPayload,
+                                andThumbnail thumbnailAttachment: UNNotificationAttachment) {
+        
+        guard let bestAttemptContent = bestAttemptContent,
+            let imageUrlString = payloadObject.edvMedia,
+            let imageUrl = URL(string: imageUrlString) else {
+                return
+        }
+        
+        NotificationServiceUtils.downloadPhoto(withUrl: imageUrl, hidden: true, through: { [weak self] (imageAttachment, error) in
+            if let error = error {
+                self?.debug(error.localizedDescription)
+            } else if let imageAttachment = imageAttachment {
+                bestAttemptContent.attachments = [imageAttachment, thumbnailAttachment]
+            }
+            
+            self?.contentHandler?(bestAttemptContent)
+        })
     }
     
     private func debug(_ message: String) {
@@ -83,7 +111,7 @@ class NotificationService: UNNotificationServiceExtension {
     
     override func serviceExtensionTimeWillExpire() {
         if let contentHandler = contentHandler,
-            let bestAttemptContent =  bestAttemptContent {
+            let bestAttemptContent = bestAttemptContent {
             contentHandler(bestAttemptContent)
         }
     }
