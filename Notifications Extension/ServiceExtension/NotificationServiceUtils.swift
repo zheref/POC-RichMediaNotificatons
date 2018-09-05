@@ -47,7 +47,7 @@ struct NotificationServiceUtils {
         return payload["video-url"] != nil && payload["bloomed-image-url"] == nil
     }
     
-    static func downloadPhoto(withUrl url: URL, through returner: @escaping AttachmentReturner) {
+    static func downloadPhoto(withUrl url: URL, hidden: Bool, through returner: @escaping AttachmentReturner) {
         URLSession.shared.downloadTask(with: url) { (downloadedUrl, response, error) in
             if let error = error {
                 print(error.localizedDescription)
@@ -77,7 +77,8 @@ struct NotificationServiceUtils {
             
             do {
                 let attachment = try UNNotificationAttachment(identifier: url.absoluteString, url: urlToUse, options: [
-                    UNNotificationAttachmentOptionsTypeHintKey: kUTTypeJPEG
+                    UNNotificationAttachmentOptionsTypeHintKey: kUTTypeJPEG,
+                    UNNotificationAttachmentOptionsThumbnailHiddenKey: hidden
                 ])
                 returner(attachment, nil)
             } catch let error {
@@ -116,11 +117,9 @@ struct NotificationServiceUtils {
             // ----
             
             do {
-//                let options = [
-//                    UNNotificationAttachmentOptionsTypeHintKey: kUTTypeMPEG4
-//                ]
-                
-                let attachment = try UNNotificationAttachment(identifier: url.absoluteString, url: urlToUse, options: nil)
+                let attachment = try UNNotificationAttachment(identifier: url.absoluteString, url: urlToUse, options: [
+                    UNNotificationAttachmentOptionsThumbnailHiddenKey: true
+                ])
                 returner(attachment, nil)
             } catch let error {
                 print(error.localizedDescription)

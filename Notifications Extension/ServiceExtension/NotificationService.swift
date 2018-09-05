@@ -31,12 +31,17 @@ class NotificationService: UNNotificationServiceExtension {
                 return
         }
         
-        NotificationServiceUtils.downloadPhoto(withUrl: thumbnailUrl) { [weak self] (attachment, error) in
+        NotificationServiceUtils.downloadPhoto(withUrl: thumbnailUrl, hidden: false) { [weak self] (attachment, error) in
             if let error = error {
-                print(error.localizedDescription)
-            } else if let attachment = attachment {
-                bestAttemptContent.attachments = [attachment]
+                self?.debug(error.localizedDescription)
             }
+            
+            guard let attachment = attachment else {
+                self?.contentHandler?(bestAttemptContent)
+                return
+            }
+            
+            bestAttemptContent.attachments = [attachment]
             
             if payloadObject is VideoNotificationContentPayload {
                 guard let videoUrlString = payloadObject.edvMedia,
@@ -44,19 +49,37 @@ class NotificationService: UNNotificationServiceExtension {
                         return
                 }
                 
-                NotificationServiceUtils.downloadVideo(withUrl: videoUrl, through: { [weak self] (attachment, error) in
+                NotificationServiceUtils.downloadVideo(withUrl: videoUrl, through: { [weak self] (videoAttachment, error) in
                     if let error = error {
-                        print(error.localizedDescription)
-                    } else if let attachment = attachment {
-                        bestAttemptContent.attachments = [attachment]
+                        self?.debug(error.localizedDescription)
+                    } else if let videoAttachment = videoAttachment {
+                        bestAttemptContent.attachments = [videoAttachment, attachment]
                     }
                     
                     self?.contentHandler?(bestAttemptContent)
                 })
             } else {
-                self?.contentHandler?(bestAttemptContent)
+                guard let imageUrlString = payloadObject.edvMedia,
+                    let imageUrl = URL(string: imageUrlString) else {
+                        return
+                }
+                
+                NotificationServiceUtils.downloadPhoto(withUrl: imageUrl, hidden: false, through: { [weak self] (imageAttachment, error) in
+                    if let error = error {
+                        self?.debug(error.localizedDescription)
+                    } else if let imageAttachment = imageAttachment {
+                        bestAttemptContent.attachments = [imageAttachment]
+                    }
+                    
+                    self?.contentHandler?(bestAttemptContent)
+                })
             }
         }
+    }
+    
+    private func debug(_ message: String) {
+        print(message)
+        bestAttemptContent?.body = message
     }
     
     override func serviceExtensionTimeWillExpire() {
