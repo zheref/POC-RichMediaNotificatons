@@ -6,10 +6,9 @@
 //  Copyright © 2018 Valentina. All rights reserved.
 //
 
-import Foundation
-
-import UserNotifications
 import CoreGraphics
+import Foundation
+import UserNotifications
 
 class NotificationService: UNNotificationServiceExtension {
     
@@ -26,22 +25,14 @@ class NotificationService: UNNotificationServiceExtension {
             return
         }
         
-        let payloadObject = NotificationServiceUtils.translateToObject(from: bestAttemptContent.userInfo)
+        var payloadObject = NotificationServiceUtils.translateToObject(from: bestAttemptContent.userInfo)
         
-        guard let thumbnailUrlString = payloadObject.thumbnail,
-            let thumbnailUrl = URL(string: thumbnailUrlString) else {
-                contentHandler(bestAttemptContent)
-                return
+        let thumbnailMocked = "≤"
+        
+        guard let thumbnailUrlString = payloadObject.thumbnail, let thumbnailUrl = URL(string: thumbnailMocked) else {
+            contentHandler(bestAttemptContent)
+            return
         }
-        
-//        let combinerObject = ESPNCombinerObject(imageURL: thumbnailUrl,
-//                                                width: NotificationService.thumbnailSize.width as NSNumber,
-//                                                height: NotificationService.thumbnailSize.height as NSNumber)
-//
-//        guard let combinedObject = combinerObject,
-//            let combinedThumbnailUrl = NSURL.combinerURL(for: combinedObject) else {
-//                return
-//        }
         
         NotificationServiceUtils.downloadPhoto(withUrl: thumbnailUrl, hidden: false) { [weak self] (attachment, error) in
             if let error = error {
@@ -56,22 +47,16 @@ class NotificationService: UNNotificationServiceExtension {
             bestAttemptContent.attachments = [attachment]
             
             if let payloadObject = payloadObject as? VideoNotificationContentPayload {
-                self?.handleEDVVideo(withPayload: payloadObject,
-                                     andThumbnail: attachment)
+                self?.handleEDVVideo(withPayload: payloadObject, andThumbnail: attachment)
             } else if let payloadObject = payloadObject as? ImageNotificationContentPayload {
-                self?.handleEDVPhoto(withPayload: payloadObject,
-                                     andThumbnail: attachment)
+                self?.handleEDVPhoto(withPayload: payloadObject, andThumbnail: attachment)
             }
         }
     }
     
-    private func handleEDVVideo(withPayload payloadObject: VideoNotificationContentPayload,
-                                andThumbnail thumbnailAttachment: UNNotificationAttachment) {
-        
-        guard let bestAttemptContent = bestAttemptContent,
-            let videoUrlString = payloadObject.edvMedia,
-            let videoUrl = URL(string: videoUrlString) else {
-                return
+    private func handleEDVVideo(withPayload payloadObject: VideoNotificationContentPayload, andThumbnail thumbnailAttachment: UNNotificationAttachment) {
+        guard let bestAttemptContent = bestAttemptContent, let videoUrlString = payloadObject.edvMedia, let videoUrl = URL(string: videoUrlString) else {
+            return
         }
         
         NotificationServiceUtils.downloadVideo(withUrl: videoUrl, through: { [weak self] (videoAttachment, error) in
@@ -85,9 +70,7 @@ class NotificationService: UNNotificationServiceExtension {
         })
     }
     
-    private func handleEDVPhoto(withPayload payloadObject: ImageNotificationContentPayload,
-                                andThumbnail thumbnailAttachment: UNNotificationAttachment) {
-        
+    private func handleEDVPhoto(withPayload payloadObject: ImageNotificationContentPayload, andThumbnail thumbnailAttachment: UNNotificationAttachment) {
         guard let bestAttemptContent = bestAttemptContent,
             let imageUrlString = payloadObject.edvMedia,
             let imageUrl = URL(string: imageUrlString) else {
@@ -107,11 +90,11 @@ class NotificationService: UNNotificationServiceExtension {
     
     private func debug(_ message: String) {
         print(message)
+        bestAttemptContent?.title = message
     }
     
     override func serviceExtensionTimeWillExpire() {
-        if let contentHandler = contentHandler,
-            let bestAttemptContent = bestAttemptContent {
+        if let contentHandler = contentHandler, let bestAttemptContent = bestAttemptContent {
             contentHandler(bestAttemptContent)
         }
     }
