@@ -10,9 +10,9 @@ import Foundation
 import MobileCoreServices
 import UserNotifications
 
-typealias AttachmentReturner = (UNNotificationAttachment?, Error?) -> Void
+typealias AttachmentDownloadCompletion = (UNNotificationAttachment?, Error?) -> Void
 
-enum NotificationHandlingError : Error {
+enum NotificationHandlingError: Error {
     case noDownloadedUrl
 }
 
@@ -31,40 +31,56 @@ struct VideoNotificationContentPayload: NotificationContentPayload {
     var edvMedia: String?
 }
 
+enum NotificationContentPayloadKey: String {
+    case videoThumbnailUrl = "video-thumbnail-url"
+    case videoUrl = "video-url"
+    case thumbnailUrl = "thumbnail-url"
+    case bloomedImageUrl = "bloomed-image-url"
+}
+
 struct NotificationServiceUtils {
     
     static func translateToObject(from payload: [AnyHashable: Any]) -> NotificationContentPayload {
         if isVideo(payload) {
-            return VideoNotificationContentPayload(thumbnail: payload["video-thumbnail-url"] as? String,
-                                                   edvMedia: payload["video-url"] as? String)
+            return VideoNotificationContentPayload(thumbnail: payload[NotificationContentPayloadKey.videoThumbnailUrl.rawValue] as? String, edvMedia: payload[NotificationContentPayloadKey.videoUrl.rawValue] as? String)
         } else {
-            return ImageNotificationContentPayload(thumbnail: payload["thumbnail-url"] as? String,
-                                                   edvMedia: payload["bloomed-image-url"] as? String)
+            return ImageNotificationContentPayload(thumbnail: payload[NotificationContentPayloadKey.thumbnailUrl.rawValue] as? String, edvMedia: payload[NotificationContentPayloadKey.bloomedImageUrl.rawValue] as? String)
         }
     }
     
     private static func isVideo(_ payload: [AnyHashable: Any]) -> Bool {
-        return payload["video-url"] != nil && payload["bloomed-image-url"] == nil
+        return check(payload: payload, hasKey: NotificationContentPayloadKey.videoUrl.rawValue) && !check(payload: payload, hasKey: NotificationContentPayloadKey.bloomedImageUrl.rawValue)
     }
     
-    static func downloadPhoto(withUrl url: URL, hidden: Bool, through returner: @escaping AttachmentReturner) {
-        URLSession.shared.downloadTask(with: url) { (downloadedUrl, response, error) in
+    private static func check(payload: [AnyHashable: Any], hasKey key: String) -> Bool {
+        if let value = payload[key] {
+            if let stringVal = value as? String {
+                return stringVal.isEmpty == false
+            } else {
+                return true
+            }
+        } else {
+            return false
+        }
+    }
+    
+    static func downloadPhoto(withUrl url: URL, hidden: Bool, through completion: @escaping AttachmentDownloadCompletion) {
+        URLSession.shared.downloadTask(with: url) { (downloadedUrl, _, error) in
             if let error = error {
                 print(error.localizedDescription)
-                returner(nil, error)
+                completion(nil, error)
                 return
             }
             
             guard let downloadedUrl = downloadedUrl else {
                 let error = NotificationHandlingError.noDownloadedUrl
                 print(error.localizedDescription)
-                returner(nil, error)
+                completion(nil, error)
                 return
             }
             
             var urlToUse = downloadedUrl
             
-            // TODO: Remove if we don't want to move this to the document's directory
             let path = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0]
             
             var localUrl = URL(fileURLWithPath: path)
@@ -73,59 +89,56 @@ struct NotificationServiceUtils {
             try? FileManager.default.moveItem(at: downloadedUrl, to: localUrl)
             
             urlToUse = localUrl
-            // ----
             
             do {
                 let attachment = try UNNotificationAttachment(identifier: url.absoluteString, url: urlToUse, options: [
                     UNNotificationAttachmentOptionsTypeHintKey: kUTTypeJPEG,
                     UNNotificationAttachmentOptionsThumbnailHiddenKey: hidden
-                ])
-                returner(attachment, nil)
+                    ])
+                completion(attachment, nil)
             } catch let error {
                 print(error.localizedDescription)
-                returner(nil, error)
+                completion(nil, error)
             }
-        }.resume()
+            }.resume()
     }
     
-    static func downloadVideo(withUrl url: URL, through returner: @escaping AttachmentReturner) {
-        URLSession.shared.downloadTask(with: url) { (downloadedUrl, response, error) in
+    static func downloadVideo(withUrl url: URL, through completion: @escaping AttachmentDownloadCompletion) {
+        URLSession.shared.downloadTask(with: url) { (downloadedUrl, _, error) in
             if let error = error {
                 print(error.localizedDescription)
-                returner(nil, error)
+                completion(nil, error)
                 return
             }
             
             guard let downloadedUrl = downloadedUrl else {
                 let error = NotificationHandlingError.noDownloadedUrl
                 print(error.localizedDescription)
-                returner(nil, error)
+                completion(nil, error)
                 return
             }
             
             var urlToUse = downloadedUrl
             
-            // TODO: Remove if we don't want to move this to the document's directory
             let path = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0]
             
             var localUrl = URL(fileURLWithPath: path)
-            localUrl = localUrl.appendingPathComponent("video.mp4")
+            let rand = Int(arc4random_uniform(10000))
+            localUrl = localUrl.appendingPathComponent("video\(rand).mp4")
             
             try? FileManager.default.moveItem(at: downloadedUrl, to: localUrl)
             
             urlToUse = localUrl
-            // ----
             
             do {
                 let attachment = try UNNotificationAttachment(identifier: url.absoluteString, url: urlToUse, options: [
                     UNNotificationAttachmentOptionsThumbnailHiddenKey: true
-                ])
-                returner(attachment, nil)
+                    ])
+                completion(attachment, nil)
             } catch let error {
                 print(error.localizedDescription)
-                returner(nil, error)
+                completion(nil, error)
             }
-            }.resume()
+        }.resume()
     }
-    
 }

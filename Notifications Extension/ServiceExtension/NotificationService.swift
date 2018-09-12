@@ -25,18 +25,36 @@ class NotificationService: UNNotificationServiceExtension {
             return
         }
         
-        var payloadObject = NotificationServiceUtils.translateToObject(from: bestAttemptContent.userInfo)
+        let payloadObject = NotificationServiceUtils.translateToObject(from: bestAttemptContent.userInfo)
         
-        let thumbnailMocked = "≤"
-        
-        guard let thumbnailUrlString = payloadObject.thumbnail, let thumbnailUrl = URL(string: thumbnailMocked) else {
+        guard let thumbnailUrlString = payloadObject.thumbnail, let thumbnailUrl = URL(string: thumbnailUrlString) else {
             contentHandler(bestAttemptContent)
             return
         }
         
-        NotificationServiceUtils.downloadPhoto(withUrl: thumbnailUrl, hidden: false) { [weak self] (attachment, error) in
+        var urlToUse: URL?
+        
+        if payloadObject is VideoNotificationContentPayload {
+            urlToUse = thumbnailUrl
+        } else {
+//            let combinerObject = ESPNCombinerObject(imageURL: thumbnailUrl, width: NotificationService.thumbnailSize.width as NSNumber, height: NotificationService.thumbnailSize.height as NSNumber)
+//
+//            guard let combinedObject = combinerObject, let combinedThumbnailUrl = NSURL.combinerURL(for: combinedObject) else {
+//                contentHandler(bestAttemptContent)
+//                return
+//            }
+            
+            urlToUse = thumbnailUrl
+        }
+        
+        guard let finalUrlToUse = urlToUse else {
+            contentHandler(bestAttemptContent)
+            return
+        }
+        
+        NotificationServiceUtils.downloadPhoto(withUrl: finalUrlToUse, hidden: false) { [weak self] (attachment, error) in
             if let error = error {
-                self?.debug(error.localizedDescription)
+                print(error.localizedDescription)
             }
             
             guard let attachment = attachment else {
@@ -55,13 +73,18 @@ class NotificationService: UNNotificationServiceExtension {
     }
     
     private func handleEDVVideo(withPayload payloadObject: VideoNotificationContentPayload, andThumbnail thumbnailAttachment: UNNotificationAttachment) {
-        guard let bestAttemptContent = bestAttemptContent, let videoUrlString = payloadObject.edvMedia, let videoUrl = URL(string: videoUrlString) else {
+        guard let bestAttemptContent = bestAttemptContent else {
+            return
+        }
+        
+        guard let videoUrlString = payloadObject.edvMedia, let videoUrl = URL(string: videoUrlString) else {
+            self.contentHandler?(bestAttemptContent)
             return
         }
         
         NotificationServiceUtils.downloadVideo(withUrl: videoUrl, through: { [weak self] (videoAttachment, error) in
             if let error = error {
-                self?.debug(error.localizedDescription)
+                print(error.localizedDescription)
             } else if let videoAttachment = videoAttachment {
                 bestAttemptContent.attachments = [videoAttachment, thumbnailAttachment]
             }
@@ -71,26 +94,24 @@ class NotificationService: UNNotificationServiceExtension {
     }
     
     private func handleEDVPhoto(withPayload payloadObject: ImageNotificationContentPayload, andThumbnail thumbnailAttachment: UNNotificationAttachment) {
-        guard let bestAttemptContent = bestAttemptContent,
-            let imageUrlString = payloadObject.edvMedia,
-            let imageUrl = URL(string: imageUrlString) else {
-                return
+        guard let bestAttemptContent = bestAttemptContent else {
+            return
+        }
+        
+        guard let imageUrlString = payloadObject.edvMedia, let imageUrl = URL(string: imageUrlString) else {
+            contentHandler?(bestAttemptContent)
+            return
         }
         
         NotificationServiceUtils.downloadPhoto(withUrl: imageUrl, hidden: true, through: { [weak self] (imageAttachment, error) in
             if let error = error {
-                self?.debug(error.localizedDescription)
+                print(error.localizedDescription)
             } else if let imageAttachment = imageAttachment {
                 bestAttemptContent.attachments = [imageAttachment, thumbnailAttachment]
             }
             
             self?.contentHandler?(bestAttemptContent)
         })
-    }
-    
-    private func debug(_ message: String) {
-        print(message)
-        bestAttemptContent?.title = message
     }
     
     override func serviceExtensionTimeWillExpire() {
