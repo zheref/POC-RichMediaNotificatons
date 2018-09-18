@@ -21,15 +21,23 @@ class NotificationViewController : UIViewController, UNNotificationContentExtens
     func didReceive(_ notification: UNNotification) {
         let content = notification.request.content
         selectAttachment(from: content)
-        videoPlayer?.addToView(attachmentContainer)
     }
     
     private func selectAttachment(from content: UNNotificationContent) {
         guard let attachment = content.attachments.first else { return }
         
-        if attachment.url.startAccessingSecurityScopedResource() {
+        if attachment.url.startAccessingSecurityScopedResource() { // Review how to detect video and image from attachment
             videoPlayer = AVPlayer(url: attachment.url)
             attachment.url.stopAccessingSecurityScopedResource()
+            videoPlayer?.addToView(attachmentContainer)
+        } else {
+            do {
+                try alertImage = UIImageView(image: UIImage(data: Data(contentsOf: attachment.url)))
+            } catch {
+                print(error)
+            }
+            
+            alertImage?.addToView(attachmentContainer)
         }
     }
 }
@@ -64,5 +72,13 @@ extension AVPlayer {
         let playerLayer = AVPlayerLayer(player: self)
         playerLayer.frame = view.bounds
         view.layer.addSublayer(playerLayer)
+    }
+}
+
+extension UIImageView {
+    func addToView(_ view: UIView) {
+        let imageLayer = self.layer
+        imageLayer.frame = view.bounds
+        view.layer.addSublayer(imageLayer)
     }
 }
