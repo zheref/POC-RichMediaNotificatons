@@ -6,6 +6,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -15,31 +16,29 @@
             <objects>
                 <viewController id="M4Y-Lb-cyx" userLabel="Notification View Controller" customClass="NotificationViewController" customModule="ContentExtension" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" simulatedAppContext="notificationCenter" id="S3S-Oj-5AN">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="220"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="180"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ZOd-dj-dmR">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="220"/>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hv2-mZ-RGs">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="180.5"/>
+                                <color key="backgroundColor" red="0.66799789669999998" green="0.47512125970000002" blue="0.25860109930000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="220" id="Fto-D0-Snp"/>
+                                    <constraint firstAttribute="width" secondItem="hv2-mZ-RGs" secondAttribute="height" multiplier="16:9" id="qRa-U0-ZaZ"/>
                                 </constraints>
-                            </imageView>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="ZOd-dj-dmR" firstAttribute="leading" secondItem="2BE-c3-nQJ" secondAttribute="leading" id="0Ep-Uu-uhF"/>
-                            <constraint firstItem="ZOd-dj-dmR" firstAttribute="top" secondItem="2BE-c3-nQJ" secondAttribute="top" id="7LP-Z7-zjz"/>
-                            <constraint firstItem="ZOd-dj-dmR" firstAttribute="bottom" secondItem="2BE-c3-nQJ" secondAttribute="bottom" id="OjU-iP-b8c"/>
-                            <constraint firstItem="2BE-c3-nQJ" firstAttribute="trailing" secondItem="ZOd-dj-dmR" secondAttribute="trailing" id="cis-U2-wms"/>
+                            <constraint firstItem="hv2-mZ-RGs" firstAttribute="top" secondItem="2BE-c3-nQJ" secondAttribute="top" id="RWs-Z8-iKl"/>
+                            <constraint firstItem="hv2-mZ-RGs" firstAttribute="leading" secondItem="2BE-c3-nQJ" secondAttribute="leading" id="RjV-9w-91w"/>
+                            <constraint firstItem="hv2-mZ-RGs" firstAttribute="top" secondItem="2BE-c3-nQJ" secondAttribute="top" id="bSq-Pm-ycC"/>
+                            <constraint firstItem="2BE-c3-nQJ" firstAttribute="trailing" secondItem="hv2-mZ-RGs" secondAttribute="trailing" id="raj-cI-giA"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="2BE-c3-nQJ"/>
                     </view>
                     <extendedEdge key="edgesForExtendedLayout"/>
                     <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
-                    <size key="freeformSize" width="320" height="220"/>
-                    <connections>
-                        <outlet property="coverImageView" destination="ZOd-dj-dmR" id="WnZ-nZ-0Ld"/>
-                    </connections>
+                    <size key="freeformSize" width="320" height="180"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="vXp-U4-Rya" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

@@ -32,20 +32,7 @@ class NotificationService: UNNotificationServiceExtension {
             return
         }
         
-        var urlToUse: URL?
-        
-        if payloadObject is VideoNotificationContentPayload {
-            urlToUse = thumbnailUrl
-        } else {
-//            let combinerObject = ESPNCombinerObject(imageURL: thumbnailUrl, width: NotificationService.thumbnailSize.width as NSNumber, height: NotificationService.thumbnailSize.height as NSNumber)
-//
-//            guard let combinedObject = combinerObject, let combinedThumbnailUrl = NSURL.combinerURL(for: combinedObject) else {
-//                contentHandler(bestAttemptContent)
-//                return
-//            }
-            
-            urlToUse = thumbnailUrl
-        }
+        let urlToUse: URL? = thumbnailUrl
         
         guard let finalUrlToUse = urlToUse else {
             contentHandler(bestAttemptContent)
