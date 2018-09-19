@@ -20,13 +20,20 @@ class NotificationViewController : UIViewController, UNNotificationContentExtens
         case bloomedImageUrl = "bloomed-image-url"
     }
 
-    
     var videoPlayer: AVPlayer?
     private var alertImage: UIImageView?
     
     func didReceive(_ notification: UNNotification) {
         let content = notification.request.content
         selectAttachment(from: content)
+        
+        do {
+            try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
+        }
+        catch {
+            print(error.localizedDescription)
+        }
+        
         videoPlayer?.play()
     }
     
