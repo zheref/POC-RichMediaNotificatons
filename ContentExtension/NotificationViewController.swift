@@ -14,6 +14,12 @@ import AVFoundation
 class NotificationViewController : UIViewController, UNNotificationContentExtension {
     
     @IBOutlet weak var attachmentContainer: UIView!
+
+    enum NotificationContentPayloadKey: String {
+        case videoUrl = "video-url"
+        case bloomedImageUrl = "bloomed-image-url"
+    }
+
     
     var videoPlayer: AVPlayer?
     private var alertImage: UIImageView?
@@ -21,64 +27,79 @@ class NotificationViewController : UIViewController, UNNotificationContentExtens
     func didReceive(_ notification: UNNotification) {
         let content = notification.request.content
         selectAttachment(from: content)
+        videoPlayer?.play()
     }
     
     private func selectAttachment(from content: UNNotificationContent) {
         guard let attachment = content.attachments.first else { return }
         
-        if attachment.url.startAccessingSecurityScopedResource() { // Review how to detect video and image from attachment
-            videoPlayer = AVPlayer(url: attachment.url)
-            attachment.url.stopAccessingSecurityScopedResource()
-            videoPlayer?.addToView(attachmentContainer)
-        } else {
-            do {
-                try alertImage = UIImageView(image: UIImage(data: Data(contentsOf: attachment.url)))
-            } catch {
-                print(error)
-            }
+        if attachment.url.startAccessingSecurityScopedResource() {
+            let payload = content.userInfo as [AnyHashable: Any]
             
-            alertImage?.addToView(attachmentContainer)
+            if isVideo(payload) {
+                videoPlayer = AVPlayer(url: attachment.url)
+                
+                guard let video = videoPlayer else {
+                    print("error")
+                    return
+                }
+                
+                addPlayerToView(player: video)
+            } else {
+                do {
+                    try alertImage = UIImageView(image: UIImage(data: Data(contentsOf: attachment.url)))
+                } catch {
+                    print(error)
+                }
+                
+                guard let image = alertImage else {
+                    print("error")
+                    return
+                }
+                
+                addImageViewToView(imageView:image)
+            }
+            attachment.url.stopAccessingSecurityScopedResource()
         }
     }
+    
+    func addImageViewToView(imageView: UIView) {
+       
+        attachmentContainer.addSubview(imageView)
+        
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            attachmentContainer.topAnchor.constraint(equalTo: imageView.topAnchor),
+            attachmentContainer.leftAnchor.constraint(equalTo: imageView.leftAnchor),
+            attachmentContainer.rightAnchor.constraint(equalTo: imageView.rightAnchor),
+            attachmentContainer.bottomAnchor.constraint(equalTo: imageView.bottomAnchor)
+            ])
+    }
+    
+    func addPlayerToView(player: AVPlayer) {
+        let playerLayer = AVPlayerLayer(player: player)
+        playerLayer.frame = attachmentContainer.bounds
+        attachmentContainer.layer.addSublayer(playerLayer)
+    }
+    
+    private func isVideo(_ payload: [AnyHashable: Any]) -> Bool {
+        return check(payload: payload, hasKey: NotificationContentPayloadKey.videoUrl.rawValue) && !check(payload: payload, hasKey: NotificationContentPayloadKey.bloomedImageUrl.rawValue)
+    }
+    
+    private func check(payload: [AnyHashable: Any], hasKey key: String) -> Bool {
+        if let value = payload[key] {
+            if let stringVal = value as? String {
+                return stringVal.isEmpty == false
+            } else {
+                return true
+            }
+        } else {
+            return false
+        }
+    }
+
 }
 
-extension NotificationViewController {
-    private var mediaButtonHeight: CGFloat { return 70 }
-    private var mediaButtonWidth: CGFloat { return 70 }
-    private var mediaButtonOrigin: CGPoint {
-        return CGPoint(x: self.view.center.x - (mediaButtonWidth / 2),
-                       y: self.view.center.y - (mediaButtonHeight / 2))
-    }
-    
-    var mediaPlayPauseButtonFrame: CGRect {
-        return CGRect(x: mediaButtonOrigin.x, y: mediaButtonOrigin.y, width: mediaButtonWidth, height: mediaButtonHeight)
-    }
-    
-    var mediaPlayPauseButtonTintColor: UIColor {
-        return .white
-    }
-    
-    var mediaPlayPauseButtonType: UNNotificationContentExtensionMediaPlayPauseButtonType {
-        return .overlay
-    }
-    
-    func mediaPlay() {
-        videoPlayer?.play()
-    }
-}
 
-extension AVPlayer {
-    func addToView(_ view: UIView) {
-        let playerLayer = AVPlayerLayer(player: self)
-        playerLayer.frame = view.bounds
-        view.layer.addSublayer(playerLayer)
-    }
-}
 
-extension UIImageView {
-    func addToView(_ view: UIView) {
-        let imageLayer = self.layer
-        imageLayer.frame = view.bounds
-        view.layer.addSublayer(imageLayer)
-    }
-}
