@@ -19,20 +19,45 @@ class NotificationViewController : UIViewController, UNNotificationContentExtens
         case videoUrl = "video-url"
         case bloomedImageUrl = "bloomed-image-url"
     }
+    
+    enum NotificationContentConstants: String {
+        case outputVolumeKeyPath = "outputVolume"
+    }
 
     var videoPlayer: AVPlayer?
     private var alertImage: UIImageView?
     
-    func didReceive(_ notification: UNNotification) {
-        let content = notification.request.content
-        selectAttachment(from: content)
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
         
+        setAudioSessionCategory(AVAudioSessionCategorySoloAmbient)
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        AVAudioSession.sharedInstance().addObserver(self, forKeyPath: NotificationContentConstants.outputVolumeKeyPath.rawValue, options: NSKeyValueObservingOptions.new, context: nil)
+    }
+    
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        if keyPath == NotificationContentConstants.outputVolumeKeyPath.rawValue {
+            setAudioSessionCategory(AVAudioSessionCategoryPlayback)
+        }
+    }
+    
+    func setAudioSessionCategory(_ category:String)
+    {
         do {
-            try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
+            try AVAudioSession.sharedInstance().setCategory(category)
         }
         catch {
             print(error.localizedDescription)
         }
+    }
+    
+    func didReceive(_ notification: UNNotification) {
+        let content = notification.request.content
+        selectAttachment(from: content)
         
         videoPlayer?.play()
     }
@@ -47,7 +72,7 @@ class NotificationViewController : UIViewController, UNNotificationContentExtens
                 videoPlayer = AVPlayer(url: attachment.url)
                 
                 guard let video = videoPlayer else {
-                    print("error")
+                    print("Can't set videoPlayer")
                     return
                 }
                 
@@ -60,7 +85,7 @@ class NotificationViewController : UIViewController, UNNotificationContentExtens
                 }
                 
                 guard let image = alertImage else {
-                    print("error")
+                    print("Can't set AlertImage")
                     return
                 }
                 
