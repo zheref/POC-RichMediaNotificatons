@@ -18,6 +18,9 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
     [self registerForPushNotifications];
+    
+    NSLog(@"PUSHNOTIFICATIONS/POC :: didFinishLaunchingWithOptions...");
+    
     return YES;
 }
 
@@ -26,7 +29,15 @@
     UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
     center.delegate = self;
     
-    [center requestAuthorizationWithOptions:(UNAuthorizationOptionSound | UNAuthorizationOptionAlert | UNAuthorizationOptionBadge) completionHandler:^(BOOL granted, NSError * _Nullable error) {
+    UNAuthorizationOptions authorizationOptions;
+    
+    if (@available(iOS 12.0, *)) {
+        authorizationOptions = UNAuthorizationOptionSound | UNAuthorizationOptionAlert | UNAuthorizationOptionBadge | UNAuthorizationOptionProvidesAppNotificationSettings;
+    } else {
+        authorizationOptions = UNAuthorizationOptionSound | UNAuthorizationOptionAlert | UNAuthorizationOptionBadge;
+    }
+    
+    [center requestAuthorizationWithOptions:(UNAuthorizationOptionSound | UNAuthorizationOptionAlert | UNAuthorizationOptionBadge | UNAuthorizationOptionProvidesAppNotificationSettings) completionHandler:^(BOOL granted, NSError * _Nullable error) {
         if (!error)
         {
             [self getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings * _Nonnull settings) {
@@ -45,11 +56,14 @@
 - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken
 {
     NSLog(@"Device Token %@", deviceToken);
+    
+    NSLog(@"PUSHNOTIFICATIONS/POC :: didRegisterForRemoteNotificationsWithDeviceToken...");
 }
 
 - (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error
 {
     NSLog(@"Failed to register for remote notifications %@", error);
+    NSLog(@"PUSHNOTIFICATIONS/POC :: didFailToRegisterForRemoteNotificationsWithError...");
 }
 
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler
@@ -87,11 +101,20 @@
 {
         [self _processRemoteNotificationPayload:userInfo userAction:nil]; //OPENING APP FROM NOTIFICATION
     completionHandler(UIBackgroundFetchResultNewData);
+    
+    NSLog(@"PUSHNOTIFICATIONS/POC :: didReceiveRemoteNotification...");
 }
 
 - (void) userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void (^)(void))completionHandler
 {
     NSLog(@"Received notification");
+    NSLog(@"PUSHNOTIFICATIONS/POC :: didReceiveNotificationResponse...");
+}
+
+- (void)userNotificationCenter:(UNUserNotificationCenter *)center openSettingsForNotification:(UNNotification *)notification
+{
+    NSLog(@"Opening settings...");
+    NSLog(@"PUSHNOTIFICATIONS/POC :: openSettingsForNotification...");
 }
 
 - (void)_processRemoteNotificationPayload:(NSDictionary *)payload userAction:(NSString *)userAction
