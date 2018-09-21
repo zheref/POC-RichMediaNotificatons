@@ -14,7 +14,9 @@ import AVFoundation
 class NotificationViewController : UIViewController, UNNotificationContentExtension {
     
     @IBOutlet weak var attachmentContainer: UIView!
-
+    @IBOutlet weak var aspectRatioConstraint: NSLayoutConstraint!
+    @IBOutlet weak var thumbnailAspectRatioConstraint: NSLayoutConstraint!
+    
     enum NotificationContentPayloadKey: String {
         case videoUrl = "video-url"
         case bloomedImageUrl = "bloomed-image-url"
@@ -30,6 +32,7 @@ class NotificationViewController : UIViewController, UNNotificationContentExtens
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
+        //JC: resetting it the value to default (soloAmbient) when we dismiss the vc, in case user open the notification more that once
         setAudioSessionCategory(AVAudioSessionCategorySoloAmbient)
     }
     
@@ -58,8 +61,6 @@ class NotificationViewController : UIViewController, UNNotificationContentExtens
     func didReceive(_ notification: UNNotification) {
         let content = notification.request.content
         selectAttachment(from: content)
-        
-        videoPlayer?.play()
     }
     
     private func selectAttachment(from content: UNNotificationContent) {
@@ -77,6 +78,7 @@ class NotificationViewController : UIViewController, UNNotificationContentExtens
                 }
                 
                 addPlayerToView(player: video)
+                videoPlayer?.play()
             } else {
                 do {
                     try alertImage = UIImageView(image: UIImage(data: Data(contentsOf: attachment.url)))
@@ -87,6 +89,12 @@ class NotificationViewController : UIViewController, UNNotificationContentExtens
                 guard let image = alertImage else {
                     print("Can't set AlertImage")
                     return
+                }
+                
+                if image.frame.height >= image.frame.width {
+                    aspectRatioConstraint.isActive = false
+                    thumbnailAspectRatioConstraint.isActive = true
+                    image.contentMode = UIViewContentMode.scaleAspectFill
                 }
                 
                 addImageViewToView(imageView:image)
