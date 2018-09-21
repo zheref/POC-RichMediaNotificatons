@@ -11,23 +11,21 @@ import UserNotifications
 import UserNotificationsUI
 import AVFoundation
 
-class NotificationViewController : UIViewController, UNNotificationContentExtension {
+class NotificationViewController: UIViewController, UNNotificationContentExtension {
     
     @IBOutlet weak var attachmentContainer: UIView!
-    @IBOutlet weak var aspectRatioConstraint: NSLayoutConstraint!
-    @IBOutlet weak var thumbnailAspectRatioConstraint: NSLayoutConstraint!
-    
-    enum NotificationContentPayloadKey: String {
-        case videoUrl = "video-url"
-        case bloomedImageUrl = "bloomed-image-url"
-    }
+    @IBOutlet weak var sixteenByNineConstraint: NSLayoutConstraint!
+    @IBOutlet weak var oneByOneConstraint: NSLayoutConstraint!
     
     enum NotificationContentConstants: String {
+        case videoUrl = "video-url"
+        case bloomedImageUrl = "bloomed-image-url"
         case outputVolumeKeyPath = "outputVolume"
     }
-
+    
     var videoPlayer: AVPlayer?
     private var alertImage: UIImageView?
+    var observation: NSKeyValueObservation?
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
@@ -42,19 +40,10 @@ class NotificationViewController : UIViewController, UNNotificationContentExtens
         AVAudioSession.sharedInstance().addObserver(self, forKeyPath: NotificationContentConstants.outputVolumeKeyPath.rawValue, options: NSKeyValueObservingOptions.new, context: nil)
     }
     
+    // TODO: We'll fix this warning on ticket  ESPNAPP-35019
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         if keyPath == NotificationContentConstants.outputVolumeKeyPath.rawValue {
             setAudioSessionCategory(AVAudioSessionCategoryPlayback)
-        }
-    }
-    
-    func setAudioSessionCategory(_ category:String)
-    {
-        do {
-            try AVAudioSession.sharedInstance().setCategory(category)
-        }
-        catch {
-            print(error.localizedDescription)
         }
     }
     
@@ -92,28 +81,34 @@ class NotificationViewController : UIViewController, UNNotificationContentExtens
                 }
                 
                 if image.frame.height >= image.frame.width {
-                    aspectRatioConstraint.isActive = false
-                    thumbnailAspectRatioConstraint.isActive = true
+                    sixteenByNineConstraint.isActive = false
+                    oneByOneConstraint.isActive = true
                     image.contentMode = UIViewContentMode.scaleAspectFill
                 }
                 
-                addImageViewToView(imageView:image)
+                addImageViewToView(imageView: image)
             }
             attachment.url.stopAccessingSecurityScopedResource()
         }
     }
     
+    func setAudioSessionCategory(_ category: String) {
+        do {
+            try AVAudioSession.sharedInstance().setCategory(category)
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+    
     func addImageViewToView(imageView: UIView) {
-       
         attachmentContainer.addSubview(imageView)
-        
         imageView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            attachmentContainer.topAnchor.constraint(equalTo: imageView.topAnchor),
-            attachmentContainer.leftAnchor.constraint(equalTo: imageView.leftAnchor),
-            attachmentContainer.rightAnchor.constraint(equalTo: imageView.rightAnchor),
-            attachmentContainer.bottomAnchor.constraint(equalTo: imageView.bottomAnchor)
+            imageView.topAnchor.constraint(equalTo: attachmentContainer.topAnchor),
+            imageView.leftAnchor.constraint(equalTo: attachmentContainer.leftAnchor),
+            imageView.rightAnchor.constraint(equalTo: attachmentContainer.rightAnchor),
+            imageView.bottomAnchor.constraint(equalTo: attachmentContainer.bottomAnchor)
             ])
     }
     
@@ -124,7 +119,7 @@ class NotificationViewController : UIViewController, UNNotificationContentExtens
     }
     
     private func isVideo(_ payload: [AnyHashable: Any]) -> Bool {
-        return check(payload: payload, hasKey: NotificationContentPayloadKey.videoUrl.rawValue) && !check(payload: payload, hasKey: NotificationContentPayloadKey.bloomedImageUrl.rawValue)
+        return check(payload: payload, hasKey: NotificationContentConstants.videoUrl.rawValue) && !check(payload: payload, hasKey: NotificationContentConstants.bloomedImageUrl.rawValue)
     }
     
     private func check(payload: [AnyHashable: Any], hasKey key: String) -> Bool {
@@ -138,8 +133,6 @@ class NotificationViewController : UIViewController, UNNotificationContentExtens
             return false
         }
     }
-
 }
-
 
 

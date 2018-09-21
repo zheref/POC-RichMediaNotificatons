@@ -39,9 +39,9 @@
                     <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
                     <size key="freeformSize" width="320" height="180"/>
                     <connections>
-                        <outlet property="aspectRatioConstraint" destination="48M-ja-lfv" id="qck-iD-OOt"/>
                         <outlet property="attachmentContainer" destination="hv2-mZ-RGs" id="PRP-Hr-QAQ"/>
-                        <outlet property="thumbnailAspectRatioConstraint" destination="Hai-cc-s63" id="OBD-8F-MC4"/>
+                        <outlet property="oneByOneConstraint" destination="Hai-cc-s63" id="hBY-7i-ewJ"/>
+                        <outlet property="sixteenByNineConstraint" destination="48M-ja-lfv" id="blp-EB-Pzg"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="vXp-U4-Rya" userLabel="First Responder" sceneMemberID="firstResponder"/>
