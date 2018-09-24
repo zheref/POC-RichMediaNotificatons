@@ -114,6 +114,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
     
     func addPlayerToView(player: AVPlayer) {
         let playerLayer = AVPlayerLayer(player: player)
+        playerLayer.videoGravity = AVLayerVideoGravityResize
         playerLayer.frame = attachmentContainer.bounds
         attachmentContainer.layer.addSublayer(playerLayer)
     }
