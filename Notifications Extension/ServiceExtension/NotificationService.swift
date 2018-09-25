@@ -3,7 +3,7 @@
 //  ESPN
 //
 //  Created by Sergio Lozano García on 8/30/18.
-//  Copyright © 2018 Valentina. All rights reserved.
+//  Copyright © 2018 ESPN. All rights reserved.
 //
 
 import CoreGraphics
@@ -11,8 +11,6 @@ import Foundation
 import UserNotifications
 
 class NotificationService: UNNotificationServiceExtension {
-    
-    static let thumbnailSize = CGSize(width: 20.0, height: 20.0)
     
     var contentHandler: ((UNNotificationContent) -> Void)?
     var bestAttemptContent: UNMutableNotificationContent?
@@ -32,14 +30,7 @@ class NotificationService: UNNotificationServiceExtension {
             return
         }
         
-        let urlToUse: URL? = thumbnailUrl
-        
-        guard let finalUrlToUse = urlToUse else {
-            contentHandler(bestAttemptContent)
-            return
-        }
-        
-        NotificationServiceUtils.downloadPhoto(withUrl: finalUrlToUse, hidden: false) { [weak self] (attachment, error) in
+        NotificationServiceUtils.downloadPhoto(withUrl: thumbnailUrl, hidden: false) { [weak self] (attachment, error) in
             if let error = error {
                 print(error.localizedDescription)
             }

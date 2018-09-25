@@ -1,9 +1,9 @@
 //
 //  NotificationServiceUtils.swift
-//  Service Extension
+//  SportsCenter
 //
-//  Created by Sergio Lozano García on 9/4/18.
-//  Copyright © 2018 Valentina. All rights reserved.
+//  Created by Sergio Lozano García on 9/5/18.
+//  Copyright © 2018 ESPN. All rights reserved.
 //
 
 import Foundation
@@ -53,15 +53,17 @@ struct NotificationServiceUtils {
     }
     
     private static func check(payload: [AnyHashable: Any], hasKey key: String) -> Bool {
+        var isValueEmpty = false
+        
         if let value = payload[key] {
             if let stringVal = value as? String {
-                return stringVal.isEmpty == false
+                isValueEmpty = !stringVal.isEmpty
             } else {
-                return true
+                isValueEmpty = true
             }
-        } else {
-            return false
         }
+        
+        return isValueEmpty
     }
     
     static func downloadPhoto(withUrl url: URL, hidden: Bool, through completion: @escaping AttachmentDownloadCompletion) {
@@ -123,8 +125,7 @@ struct NotificationServiceUtils {
             let path = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0]
             
             var localUrl = URL(fileURLWithPath: path)
-            let rand = Int(arc4random_uniform(10000))
-            localUrl = localUrl.appendingPathComponent("video\(rand).mp4")
+            localUrl = localUrl.appendingPathComponent("video.mp4")
             
             try? FileManager.default.moveItem(at: downloadedUrl, to: localUrl)
             
@@ -139,6 +140,6 @@ struct NotificationServiceUtils {
                 print(error.localizedDescription)
                 completion(nil, error)
             }
-        }.resume()
+            }.resume()
     }
 }
