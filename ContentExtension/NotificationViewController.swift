@@ -37,13 +37,15 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        AVAudioSession.sharedInstance().addObserver(self, forKeyPath: NotificationContentConstants.outputVolumeKeyPath.rawValue, options: NSKeyValueObservingOptions.new, context: nil)
-    }
-    
-    // TODO: We'll fix this warning on ticket  ESPNAPP-35019
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        if keyPath == NotificationContentConstants.outputVolumeKeyPath.rawValue {
-            setAudioSessionCategory(AVAudioSessionCategoryPlayback)
+        let audioSession = AVAudioSession.sharedInstance()
+        self.observation = audioSession.observe( \.outputVolume ) { (avAudioSession, change) in
+            if avAudioSession.value(forKeyPath: NotificationContentConstants.outputVolumeKeyPath.rawValue) != nil {
+                do {
+                    try avAudioSession.setCategory(AVAudioSessionCategoryPlayback)
+                } catch {
+                    print(error.localizedDescription)
+                }
+            }
         }
     }
     
