@@ -58,7 +58,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         if attachment.url.startAccessingSecurityScopedResource() {
             let payload = content.userInfo as [AnyHashable: Any]
             
-            if isVideo(payload) {
+            if isVideo(payload) && !isImageAttachmentURL(attachment.url) {
                 videoPlayer = AVPlayer(url: attachment.url)
                 
                 guard let video = videoPlayer else {
@@ -90,6 +90,10 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
             }
             attachment.url.stopAccessingSecurityScopedResource()
         }
+    }
+    
+    func isImageAttachmentURL(_ url: URL) -> Bool {
+        return url.absoluteString.range(of: ".jpg") != nil || url.absoluteString.range(of: ".jpeg") != nil
     }
     
     func setAudioSessionCategory(_ category: String) {
