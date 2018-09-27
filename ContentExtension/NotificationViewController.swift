@@ -37,8 +37,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let audioSession = AVAudioSession.sharedInstance()
-        self.observation = audioSession.observe( \.outputVolume ) { (avAudioSession, change) in
+        self.observation = AVAudioSession.sharedInstance().observe( \.outputVolume ) { (avAudioSession, _) in
             if avAudioSession.value(forKeyPath: NotificationContentConstants.outputVolumeKeyPath.rawValue) != nil {
                 do {
                     try avAudioSession.setCategory(AVAudioSessionCategoryPlayback)
@@ -55,7 +54,20 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
     }
     
     private func selectAttachment(from content: UNNotificationContent) {
-        guard let attachment = content.attachments.first else { return }
+        guard let attachment = content.attachments.first else {
+            let placeholder = UIImage(named: "espnNotificationPlaceholder")
+            let imageView = UIImageView(image: placeholder)
+            
+            attachmentContainer.addSubview(imageView)
+            imageView.translatesAutoresizingMaskIntoConstraints = false
+            
+            NSLayoutConstraint.activate([
+                imageView.centerXAnchor.constraint(equalTo: attachmentContainer.centerXAnchor),
+                imageView.centerYAnchor.constraint(equalTo: attachmentContainer.centerYAnchor)
+                ])
+            
+            return
+        }
         
         if attachment.url.startAccessingSecurityScopedResource() {
             let payload = content.userInfo as [AnyHashable: Any]
@@ -63,10 +75,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
             if isVideo(payload) && !isImageAttachmentURL(attachment.url) {
                 videoPlayer = AVPlayer(url: attachment.url)
                 
-                guard let video = videoPlayer else {
-                    print("Can't set videoPlayer")
-                    return
-                }
+                guard let video = videoPlayer else { return }
                 
                 addPlayerToView(player: video)
                 videoPlayer?.play()
@@ -77,15 +86,13 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
                     print(error)
                 }
                 
-                guard let image = alertImage else {
-                    print("Can't set AlertImage")
-                    return
-                }
+                guard let image = alertImage else { return }
                 
                 if image.frame.height >= image.frame.width {
                     sixteenByNineConstraint.isActive = false
                     oneByOneConstraint.isActive = true
                     image.contentMode = UIViewContentMode.scaleAspectFill
+                    self.preferredContentSize = CGSize(width: view.frame.width, height: image.frame.height)
                 }
                 
                 addImageViewToView(imageView: image)
@@ -141,5 +148,3 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         }
     }
 }
-
-
