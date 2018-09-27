@@ -92,7 +92,10 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
                     sixteenByNineConstraint.isActive = false
                     oneByOneConstraint.isActive = true
                     image.contentMode = UIViewContentMode.scaleAspectFill
-                    self.preferredContentSize = CGSize(width: view.frame.width, height: image.frame.height)
+                    
+                    if self.traitCollection.horizontalSizeClass == UIUserInterfaceSizeClass.regular && self.traitCollection.verticalSizeClass == UIUserInterfaceSizeClass.regular {
+                        self.preferredContentSize = CGSize(width: view.frame.width, height: image.frame.height)
+                    }
                 }
                 
                 addImageViewToView(imageView: image)
