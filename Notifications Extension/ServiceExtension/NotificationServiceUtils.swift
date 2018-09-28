@@ -48,7 +48,7 @@ struct NotificationServiceUtils {
         }
     }
     
-    private static func isVideo(_ payload: [AnyHashable: Any]) -> Bool {
+    static func isVideo(_ payload: [AnyHashable: Any]) -> Bool {
         return check(payload: payload, hasKey: NotificationContentPayloadKey.videoUrl.rawValue) && !check(payload: payload, hasKey: NotificationContentPayloadKey.bloomedImageUrl.rawValue)
     }
     

@@ -3,13 +3,13 @@
 //  ContentExtension
 //
 //  Created by Sergio Lozano García on 8/30/18.
-//  Copyright © 2018 Valentina. All rights reserved.
+//  Copyright © 2018 ESPN. All rights reserved.
 //
 
+import AVFoundation
 import UIKit
 import UserNotifications
 import UserNotificationsUI
-import AVFoundation
 
 class NotificationViewController: UIViewController, UNNotificationContentExtension {
     
@@ -18,8 +18,6 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
     @IBOutlet weak var oneByOneConstraint: NSLayoutConstraint!
     
     enum NotificationContentConstants: String {
-        case videoUrl = "video-url"
-        case bloomedImageUrl = "bloomed-image-url"
         case outputVolumeKeyPath = "outputVolume"
     }
     
@@ -72,7 +70,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         if attachment.url.startAccessingSecurityScopedResource() {
             let payload = content.userInfo as [AnyHashable: Any]
             
-            if isVideo(payload) && !isImageAttachmentURL(attachment.url) {
+            if NotificationServiceUtils.isVideo(payload) && !isImageAttachmentURL(attachment.url) {
                 videoPlayer = AVPlayer(url: attachment.url)
                 
                 guard let video = videoPlayer else { return }
@@ -93,9 +91,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
                     oneByOneConstraint.isActive = true
                     image.contentMode = UIViewContentMode.scaleAspectFill
                     
-                    if self.traitCollection.horizontalSizeClass == UIUserInterfaceSizeClass.regular && self.traitCollection.verticalSizeClass == UIUserInterfaceSizeClass.regular {
-                        self.preferredContentSize = CGSize(width: view.frame.width, height: image.frame.height)
-                    }
+                    self.preferredContentSize = CGSize(width: view.frame.width, height: view.frame.width)
                 }
                 
                 addImageViewToView(imageView: image)
@@ -133,21 +129,5 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         playerLayer.videoGravity = AVLayerVideoGravityResize
         playerLayer.frame = attachmentContainer.bounds
         attachmentContainer.layer.addSublayer(playerLayer)
-    }
-    
-    private func isVideo(_ payload: [AnyHashable: Any]) -> Bool {
-        return check(payload: payload, hasKey: NotificationContentConstants.videoUrl.rawValue) && !check(payload: payload, hasKey: NotificationContentConstants.bloomedImageUrl.rawValue)
-    }
-    
-    private func check(payload: [AnyHashable: Any], hasKey key: String) -> Bool {
-        if let value = payload[key] {
-            if let stringVal = value as? String {
-                return stringVal.isEmpty == false
-            } else {
-                return true
-            }
-        } else {
-            return false
-        }
     }
 }
