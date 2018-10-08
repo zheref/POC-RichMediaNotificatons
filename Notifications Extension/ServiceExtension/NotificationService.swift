@@ -3,7 +3,7 @@
 //  ESPN
 //
 //  Created by Sergio Lozano García on 8/30/18.
-//  Copyright © 2018 Valentina. All rights reserved.
+//  Copyright © 2018 ESPN. All rights reserved.
 //
 
 import CoreGraphics
@@ -11,8 +11,6 @@ import Foundation
 import UserNotifications
 
 class NotificationService: UNNotificationServiceExtension {
-    
-    static let thumbnailSize = CGSize(width: 20.0, height: 20.0)
     
     var contentHandler: ((UNNotificationContent) -> Void)?
     var bestAttemptContent: UNMutableNotificationContent?
@@ -32,27 +30,7 @@ class NotificationService: UNNotificationServiceExtension {
             return
         }
         
-        var urlToUse: URL?
-        
-        if payloadObject is VideoNotificationContentPayload {
-            urlToUse = thumbnailUrl
-        } else {
-//            let combinerObject = ESPNCombinerObject(imageURL: thumbnailUrl, width: NotificationService.thumbnailSize.width as NSNumber, height: NotificationService.thumbnailSize.height as NSNumber)
-//
-//            guard let combinedObject = combinerObject, let combinedThumbnailUrl = NSURL.combinerURL(for: combinedObject) else {
-//                contentHandler(bestAttemptContent)
-//                return
-//            }
-            
-            urlToUse = thumbnailUrl
-        }
-        
-        guard let finalUrlToUse = urlToUse else {
-            contentHandler(bestAttemptContent)
-            return
-        }
-        
-        NotificationServiceUtils.downloadPhoto(withUrl: finalUrlToUse, hidden: false) { [weak self] (attachment, error) in
+        NotificationServiceUtils.downloadPhoto(withUrl: thumbnailUrl, hidden: false) { [weak self] (attachment, error) in
             if let error = error {
                 print(error.localizedDescription)
             }

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14113" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="M4Y-Lb-cyx">
-    <device id="retina4_7" orientation="portrait">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14313.18" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="M4Y-Lb-cyx">
+    <device id="ipad9_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14283.14"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -15,30 +15,38 @@
             <objects>
                 <viewController id="M4Y-Lb-cyx" userLabel="Notification View Controller" customClass="NotificationViewController" customModule="ContentExtension" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" simulatedAppContext="notificationCenter" id="S3S-Oj-5AN">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="220"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="180"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ZOd-dj-dmR">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="220"/>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dEY-F4-lBI" userLabel="Attachment container">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="180"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="220" id="Fto-D0-Snp"/>
+                                    <constraint firstAttribute="width" secondItem="dEY-F4-lBI" secondAttribute="height" multiplier="16:9" id="HIC-Cr-Ezb"/>
+                                    <constraint firstAttribute="width" secondItem="dEY-F4-lBI" secondAttribute="height" multiplier="1:1" priority="750" id="ufS-0R-lbQ"/>
                                 </constraints>
-                            </imageView>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="ZOd-dj-dmR" firstAttribute="leading" secondItem="2BE-c3-nQJ" secondAttribute="leading" id="0Ep-Uu-uhF"/>
-                            <constraint firstItem="ZOd-dj-dmR" firstAttribute="top" secondItem="2BE-c3-nQJ" secondAttribute="top" id="7LP-Z7-zjz"/>
-                            <constraint firstItem="ZOd-dj-dmR" firstAttribute="bottom" secondItem="2BE-c3-nQJ" secondAttribute="bottom" id="OjU-iP-b8c"/>
-                            <constraint firstItem="2BE-c3-nQJ" firstAttribute="trailing" secondItem="ZOd-dj-dmR" secondAttribute="trailing" id="cis-U2-wms"/>
+                            <constraint firstItem="dEY-F4-lBI" firstAttribute="top" secondItem="S3S-Oj-5AN" secondAttribute="top" id="8K1-SO-keS"/>
+                            <constraint firstItem="dEY-F4-lBI" firstAttribute="leading" secondItem="2BE-c3-nQJ" secondAttribute="leading" id="MQr-aG-Apb"/>
+                            <constraint firstItem="dEY-F4-lBI" firstAttribute="bottom" secondItem="2BE-c3-nQJ" secondAttribute="bottom" id="PhQ-e6-xiM"/>
+                            <constraint firstItem="dEY-F4-lBI" firstAttribute="trailing" secondItem="2BE-c3-nQJ" secondAttribute="trailing" id="Zwi-2R-Th8"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="2BE-c3-nQJ"/>
+                        <variation key="heightClass=regular-widthClass=regular">
+                            <mask key="constraints">
+                                <exclude reference="PhQ-e6-xiM"/>
+                            </mask>
+                        </variation>
                     </view>
                     <extendedEdge key="edgesForExtendedLayout"/>
                     <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
-                    <size key="freeformSize" width="320" height="220"/>
+                    <size key="freeformSize" width="320" height="180"/>
                     <connections>
-                        <outlet property="coverImageView" destination="ZOd-dj-dmR" id="WnZ-nZ-0Ld"/>
+                        <outlet property="attachmentContainer" destination="dEY-F4-lBI" id="9EL-rl-9mG"/>
+                        <outlet property="oneByOneConstraint" destination="ufS-0R-lbQ" id="fXb-xJ-q1H"/>
+                        <outlet property="sixteenByNineConstraint" destination="HIC-Cr-Ezb" id="qsu-3y-OYx"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="vXp-U4-Rya" userLabel="First Responder" sceneMemberID="firstResponder"/>
